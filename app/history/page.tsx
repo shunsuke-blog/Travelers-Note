@@ -126,7 +126,7 @@ export default function HistoryPage() {
       setSelectedPrefCode(null);
     }
   };
-
+  
   const handleDelete = (name: string) => {
     if (confirm(`${name} の きろくを すてますか？`)) {
       const newHistory = history.filter((item) => item.name !== name);
