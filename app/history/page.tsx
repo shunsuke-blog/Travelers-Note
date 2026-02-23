@@ -224,9 +224,9 @@ export default function HistoryPage() {
             ${visitedPrefCodes.map(code => `.geolonia-svg-map [data-code="${code}"] { fill: #33aa33 !important; }`).join('\n')}
             ${selectedPrefCode ? `.geolonia-svg-map [data-code="${selectedPrefCode}"] { fill: #ffd700 !important; filter: drop-shadow(0 0 8px #ffd700); }` : ""}
           `}} />
-          <div className="w-full flex justify-center items-center p-6 bg-black" onClick={handleMapClick}>
+          <div className="w-full flex justify-center items-center p-4 bg-black" onClick={handleMapClick}>
             <div
-              className="w-full max-w-[280px] shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+              className="w-full shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               dangerouslySetInnerHTML={{ __html: mapSvg }}
             />
           </div>
