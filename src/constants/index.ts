@@ -1,3 +1,11 @@
+// アプリケーション設定値
+export const APP_CONFIG = {
+  SPEED_KMH: 40,
+  DISTANCE_MARGIN: 80,
+  MAX_API_RETRIES: 5, // DoS攻撃を防ぐための最大試行回数
+  DEBOUNCE_MS: 500, // インクリメンタルサーチの遅延時間
+};
+
 // 都道府県名と、その代表的な座標（県庁所在地付近）
 export const PREFECTURE_DATA: { name: string; y: number; x: number }[] = [
   { name: "北海道", y: 43.06, x: 141.35 },

@@ -1,45 +1,42 @@
 "use client";
 
 import React from 'react';
+import { Station } from '@/types'; // 共通の型定義をインポート
 
 type Props = {
-  resultStation: {
-    line: string;
-    name: string;
-    prefecture: string;
-    x: number;
-    y: number;
-    prev?: string;
-    next?: string;
-    estimatedTime?: number;
-  };
+  resultStation: Station;
   departureStation: string;
 };
 
 export default function ResultCard({ resultStation, departureStation }: Props) {
 
   const handleSave = () => {
-    const visitDate = new Date().toLocaleDateString();
-    const currentHistory = JSON.parse(localStorage.getItem("stationHistory") || "[]");
+    try {
+      const visitDate = new Date().toLocaleDateString();
+      const currentHistory = JSON.parse(localStorage.getItem("stationHistory") || "[]");
 
-    const newEntry = {
-      name: resultStation.name,
-      line: resultStation.line,
-      date: visitDate,
-      prefecture: resultStation.prefecture,
-      x: resultStation.x, // 座標も忘れず保存
-      y: resultStation.y
-    };
+      const newEntry = {
+        name: resultStation.name,
+        line: resultStation.line,
+        date: visitDate,
+        prefecture: resultStation.prefecture,
+        x: resultStation.x,
+        y: resultStation.y
+      };
 
-    const newHistory = [...currentHistory, newEntry];
-    localStorage.setItem("stationHistory", JSON.stringify(newHistory));
-    alert(`${resultStation.name} を ぼうけんのきろくに しるした！`);
+      const newHistory = [...currentHistory, newEntry];
+      localStorage.setItem("stationHistory", JSON.stringify(newHistory));
+      alert(`${resultStation.name} を ぼうけんのきろくに しるした！`);
+    } catch (error) {
+      console.error("保存に失敗しました:", error);
+      alert("きろくの ほぞんに しっぱいしました。ブラウザの設定を確認してください。");
+    }
   };
 
   return (
     <div className="pixel-box w-full animate-in zoom-in-95 duration-300">
 
-      {/* 路線名：クエストのカテゴリー風 */}
+      {/* 路線名 */}
       <p className="text-[10px] text-[#ffd700] font-bold mb-4 tracking-widest text-center">
         ▼ ROUTE: {resultStation.line}
       </p>
@@ -103,10 +100,11 @@ export default function ResultCard({ resultStation, departureStation }: Props) {
 
         {/* サブアクション：Google Maps */}
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resultStation.name + "駅")}`}
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resultStation.name + '駅')}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[9px] text-slate-500 hover:text-[#ffd700] transition-colors text-center uppercase tracking-widest"
+          aria-label={`${resultStation.name}をGoogle Mapsで開く`}
         >
           - Open World Map -
         </a>
