@@ -1,4 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
 @import "tailwindcss";
+
+body {
+  font-family: "DotGothic16", sans-serif;
+  background-color: #0c0e14; /* 深いミッドナイトブルー*/
+}
 
 :root {
   --background: #ffffff;
@@ -23,4 +29,35 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .pixel-box {
+    @apply border-2 border-white bg-[#0c0e14] p-5 text-[#f8f9fa] relative;
+
+    /* outlineの代わりに内側に白い線を引く設定 */
+    /* これでズレが解消され、完璧な二重線になります */
+    box-shadow:
+      inset 0 0 0 2px #0c0e14,
+      /* 内側の隙間（背景色と同じ） */ inset 0 0 0 4px #ffffff,
+      /* 二重線の内側の白線 */ 4px 4px 0px 0px rgba(0, 0, 0, 0.5); /* 外側のドロップシャドウ */
+  }
+
+  .pixel-button {
+    @apply border-2 border-white bg-[#1a202c] px-4 py-2 text-[#f8f9fa] cursor-pointer text-center transition-all relative;
+    /* ボタンも少し浮かせたような影をつけるとRPG感が増します */
+    box-shadow: 2px 2px 0px 0px #ffffff;
+  }
+
+  .pixel-button:hover:not(:disabled) {
+    @apply bg-[#2d3748] border-[#ffd700] text-[#ffd700];
+    box-shadow: 2px 2px 0px 0px #ffd700;
+  }
+
+  /* app/globals.css */
+
+  .pixel-button:active:not(:disabled) {
+    /* translate-x-[1px] translate-y-[1px] を標準クラスに書き換え */
+    @apply translate-x-px translate-y-px shadow-none;
+  }
 }
