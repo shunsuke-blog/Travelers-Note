@@ -22,3 +22,8 @@ export type Coordinates = {
   lat: number;
   lon: number;
 };
+
+// 履歴データ用の拡張型
+export interface HistoryRecord extends Station {
+  date: string;
+}
