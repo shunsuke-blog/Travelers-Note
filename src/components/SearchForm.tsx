@@ -19,6 +19,7 @@ interface SearchFormProps {
   showSuggestions: boolean;
   setShowSuggestions: (val: boolean) => void;
   setCurrentCoords: (coords: Coordinates | null) => void;
+  setResultStation: (station: Station | null) => void;
   maxTime: string;
   setMaxTime: (val: string) => void;
   selectedPref: string;

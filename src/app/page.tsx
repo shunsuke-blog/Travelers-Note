@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // ★ useRef を追加
 import Link from "next/link";
 import { PREFECTURES, PREFECTURE_DATA, APP_CONFIG } from '@/constants';
 import { calculateDistance } from '@/utils/utils';
@@ -11,7 +11,9 @@ import ResultCard from '@/components/ResultCard';
 import SearchForm from '@/components/SearchForm';
 
 export default function Home() {
-  // フックによる状態・ロジックの取得
+  // 1. スクロール先の目印（Ref）を作成
+  const resultRef = useRef<HTMLDivElement>(null);
+
   const {
     departureStation, setDepartureStation,
     suggestions, showSuggestions, setShowSuggestions,
@@ -22,14 +24,12 @@ export default function Home() {
     loading, statusMessage, resultStation, setResultStation, executeGacha
   } = useGachaLogic();
 
-  // コンポーネント固有の状態
   const [selectedPref, setSelectedPref] = useState<string>("全国");
   const [lines, setLines] = useState<string[]>([]);
   const [maxTime, setMaxTime] = useState<string>("60");
   const [displayPrefectures, setDisplayPrefectures] = useState<string[]>(PREFECTURES);
   const [selectedLine, setSelectedLine] = useState<string>("すべて");
 
-  // 都道府県変更時の路線取得
   useEffect(() => {
     setSelectedLine("すべて");
     if (selectedPref === "全国") {
@@ -52,31 +52,24 @@ export default function Home() {
     fetchLines();
   }, [selectedPref]);
 
-  // 出発地と制限時間に基づく都道府県リストの再計算
   useEffect(() => {
     if (!currentCoords || maxTime === "0") {
       setDisplayPrefectures(PREFECTURES);
       return;
     }
-
     const maxDist = (parseInt(maxTime) / 60) * APP_CONFIG.SPEED_KMH;
     const searchRadius = maxDist + APP_CONFIG.DISTANCE_MARGIN;
-
     const filteredPrefs = PREFECTURE_DATA.filter(pref => {
       const dist = calculateDistance(currentCoords.lat, currentCoords.lon, pref.y, pref.x);
       return dist <= searchRadius;
     }).map(d => d.name);
-
     setDisplayPrefectures(filteredPrefs);
-
-    // 選択中の都道府県が到達圏外になった場合はリセットするが、
-    // selectedPrefの更新はユーザーアクションを起点に行うのが理想であるため
-    // このuseEffect内での直接的なsetSelectedPref呼び出しは削除し、UI側で制御することを推奨します。
   }, [currentCoords, maxTime]);
 
-  // ガチャの実行ハンドラ
-  const handleGacha = () => {
-    executeGacha({
+  // 2. スクロール処理を含む実行ハンドラにアップグレード
+  const onGachaClick = async () => {
+    // ガチャを実行
+    await executeGacha({
       departureStation,
       currentCoords,
       selectedPref,
@@ -85,6 +78,18 @@ export default function Home() {
       lines,
       displayPrefectures
     });
+
+    // 3. 結果の描画を待ってからスクロール
+    // executeGachaの中で resultStation が更新されるため、
+    // setTimeoutでマウント後のDOMを捕捉します
+    setTimeout(() => {
+      if (resultRef.current) {
+        resultRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 150);
   };
 
   return (
@@ -105,6 +110,7 @@ export default function Home() {
           </p>
         </div>
 
+        {/* handleGacha の代わりに onGachaClick を渡す */}
         <SearchForm
           departureStation={departureStation}
           setDepartureStation={setDepartureStation}
@@ -122,8 +128,7 @@ export default function Home() {
           selectedLine={selectedLine}
           setSelectedLine={setSelectedLine}
           loading={loading}
-          currentCoords={currentCoords}
-          handleGacha={handleGacha}
+          handleGacha={onGachaClick}
         />
 
         {statusMessage && (
@@ -134,17 +139,20 @@ export default function Home() {
           </div>
         )}
 
-        {resultStation && (
-          <div className="mt-8 pt-8 border-t-2 border-dashed border-[#4a5568] animate-in slide-in-from-top-4 duration-500">
-            <div className="text-[#ffd700] text-[10px] font-bold mb-4 text-center">
-              ▼ 目的地が あらわれた！
+        {/* 4. スクロール位置の着地点を Ref で指定 (scroll-mt で上部に余白を確保) */}
+        <div ref={resultRef} className="scroll-mt-10">
+          {resultStation && (
+            <div className="mt-8 pt-8 border-t-2 border-dashed border-[#4a5568] animate-in slide-in-from-top-4 duration-500">
+              <div className="text-[#ffd700] text-[10px] font-bold mb-4 text-center">
+                ▼ 目的地が あらわれた！
+              </div>
+              <ResultCard
+                resultStation={resultStation}
+                departureStation={departureStation}
+              />
             </div>
-            <ResultCard
-              resultStation={resultStation}
-              departureStation={departureStation}
-            />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <footer className="mt-12 text-center pb-10">
