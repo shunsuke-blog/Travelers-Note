@@ -126,7 +126,7 @@ export default function HistoryPage() {
       setSelectedPrefCode(null);
     }
   };
-  
+
   const handleDelete = (name: string) => {
     if (confirm(`${name} の きろくを すてますか？`)) {
       const newHistory = history.filter((item) => item.name !== name);
@@ -288,7 +288,7 @@ export default function HistoryPage() {
                       <div className="flex justify-between items-start w-full">
                         <div className="min-w-0 flex-1">
                           <div className="mb-2">
-                            <p className="font-bold text-xl text-white leading-tight break-words">{item.name}</p>
+                            <p className="font-bold text-xl text-white leading-tight wrap-break-words">{item.name}</p>
                             <p className="text-[10px] text-[#ffd700] mt-1">{item.line}</p>
                           </div>
                           <p className="text-[10px] text-slate-500 font-bold uppercase">Tochaku: {item.date}</p>
